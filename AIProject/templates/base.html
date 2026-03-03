@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recycling Classifier</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+
+</head>
+<body>
+    {% include 'header.html' %}
+
+    {% block body %} {% endblock %}
+
+    {% include 'footer.html' %}
+    
+</body>
+
+<script>
+    const upload = document.getElementById("upload");
+    const preview = document.getElementById("preview");
+    const loader = document.getElementById("loader");
+    const result = document.getElementById("result");
+    const category = document.getElementById("category");
+    const confidenceText = document.getElementById("confidenceText");
+    const progress = document.getElementById("progress");
+
+    upload.addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.style.display = "block";
+                result.style.display = "none";
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function predict() {
+        if (!preview.src) { alert("Please upload trash image"); return; }
+        loader.style.display = "block";
+        setTimeout(() => {
+            loader.style.display = "none";
+            const classes = ["♻️ Recyclable", "🗑 General Waste", "🌿 Organic Waste", "🔋 Hazardous Waste", "🧴 Plastic", "📰 Paper"];
+            const pred = classes[Math.floor(Math.random() * classes.length)];
+            const confidence = (Math.random() * 25 + 70).toFixed(2);
+            category.innerText = "Category: " + pred;
+            confidenceText.innerText = "Confidence: " + confidence + "%";
+            progress.style.width = confidence + "%";
+            result.style.display = "block";
+        }, 1500);
+    }
+
+    function scrollToUpload() { document.querySelector('.drop').scrollIntoView({ behavior: 'smooth' }); }
+</script>
+</html>
