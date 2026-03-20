@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Recycling AI - Our Team</title>
+
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap");
+
+            body {
+                background: #f8f9fa;
+                font-family: "Fira Sans", sans-serif;
+            }
+
+            .team-card {
+                border-radius: 15px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+                transition: 0.3s ease;
+            }
+
+            .team-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            }
+
+            .profile-img {
+                width: 120px;
+                height: 120px;
+                object-fit: cover;
+                border-radius: 50%;
+                border: 4px solid #28a745;
+            }
+
+            .fade-down {
+                animation: fadeDown 0.8s ease forwards;
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            @keyframes fadeDown {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            footer {
+                background: #212529;
+                color: white;
+                padding: 15px 0;
+            }
+        </style>
+    </head>
+
+    <body class="d-flex flex-column min-vh-100">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+            <div class="container">
+                <a class="navbar-brand fw-bold fs-4" href="/">♻ Recycling AI</a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div
+                    class="collapse navbar-collapse justify-content-end"
+                    id="navbarNav"
+                >
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/about">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">Team</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/user-guide"
+                                >User Guide</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Heading Section -->
+        <div class="container my-5 text-center fade-down">
+            <h1 class="fw-bold mb-3">Meet Our Team</h1>
+            <p class="text-muted">
+                The passionate innovators behind the Recycling AI project.
+            </p>
+        </div>
+
+        <!-- Team Members -->
+        <div class="container mb-5 flex-grow-1 fade-down">
+            <div class="row g-4">
+                <!-- Member 1 -->
+                <div class="col-md-6 col-lg-4 fade-down">
+                    <div class="card team-card text-center p-4">
+                        <img
+                            src="https://www.nme.com/wp-content/uploads/2024/03/Sydney_Sweeney_Cropped.jpg"
+                            class="profile-img mx-auto mb-3"
+                        />
+                        <h5 class="fw-bold">Yu Nandar Hlaing</h5>
+                        <p class="text-success">Developer</p>
+                        <p class="small text-muted">
+                            Duis lectus lorem, consectetur quis feugiat quis,
+                            pretium eget enim. Nam et nunc egestas, commodo
+                            tellus sed, venenatis ante. Curabitur enim justo,
+                            aliquet sit amet imperdiet id, consequat vitae
+                            metus.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Member 2 -->
+                <div class="col-md-6 col-lg-4 fade-down">
+                    <div class="card team-card text-center p-4">
+                        <img
+                            src="https://ew.com/thmb/MF9n8bE7991fyFXwlsTpOc3EWYY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Sydney-Sweeney-The-Housemaid-New-York-screening-120625-7f559f453c274f2291a61c9a19766dd6.jpg"
+                            class="profile-img mx-auto mb-3"
+                        />
+                        <h5 class="fw-bold">Thant Htoo San</h5>
+                        <p class="text-success">Developer</p>
+                        <p class="small text-muted">
+                            Duis lectus lorem, consectetur quis feugiat quis,
+                            pretium eget enim. Nam et nunc egestas, commodo
+                            tellus sed, venenatis ante. Curabitur enim justo,
+                            aliquet sit amet imperdiet id, consequat vitae
+                            metus.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Member 3 -->
+                <div class="col-md-6 col-lg-4 fade-down">
+                    <div class="card team-card text-center p-4">
+                        <img
+                            src="https://www.mensjournal.com/.image/w_3840,q_auto:good,c_fill,ar_16:9,g_xy_center,x_2698,y_1582/NDI6MDAwMDAwMDAxMDI4MzAy/sydney-sweeney-the-housemaid-box-office-streak.jpg?arena_f_auto"
+                            class="profile-img mx-auto mb-3"
+                        />
+                        <h5 class="fw-bold">Han Pyae Tun</h5>
+                        <p class="text-success">Developer</p>
+                        <p class="small text-muted">
+                            Duis lectus lorem, consectetur quis feugiat quis,
+                            pretium eget enim. Nam et nunc egestas, commodo
+                            tellus sed, venenatis ante. Curabitur enim justo,
+                            aliquet sit amet imperdiet id, consequat vitae
+                            metus.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Member 4 -->
+                <div class="col-md-6 col-lg-4 fade-down">
+                    <div class="card team-card text-center p-4">
+                        <img
+                            src="https://i.guim.co.uk/img/media/60a4366db778136b625f3fab036f5f79b86b946f/1440_0_7200_5760/master/7200.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=ea064e4694b99eebc9e13ba3af2ed317"
+                            class="profile-img mx-auto mb-3"
+                        />
+                        <h5 class="fw-bold">Lin Wai Yan</h5>
+                        <p class="text-success">Developer</p>
+                        <p class="small text-muted">
+                            Duis lectus lorem, consectetur quis feugiat quis,
+                            pretium eget enim. Nam et nunc egestas, commodo
+                            tellus sed, venenatis ante. Curabitur enim justo,
+                            aliquet sit amet imperdiet id, consequat vitae
+                            metus.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Member 5 -->
+                <div class="col-md-6 col-lg-4 fade-down">
+                    <div class="card team-card text-center p-4">
+                        <img
+                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5NlAjleMb8lHOGKmBsA8X1uU3-FqWydH-mA&s"
+                            class="profile-img mx-auto mb-3"
+                        />
+                        <h5 class="fw-bold">Shin Myat Noe Zin</h5>
+                        <p class="text-success">Developer</p>
+                        <p class="small text-muted">
+                            Duis lectus lorem, consectetur quis feugiat quis,
+                            pretium eget enim. Nam et nunc egestas, commodo
+                            tellus sed, venenatis ante. Curabitur enim justo,
+                            aliquet sit amet imperdiet id, consequat vitae
+                            metus.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-auto">
+            <div class="container">
+                &copy; <span id="year"></span> Recycling AI Company.
+            </div>
+        </footer>
+
+        <script>
+            document.getElementById("year").textContent =
+                new Date().getFullYear();
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>

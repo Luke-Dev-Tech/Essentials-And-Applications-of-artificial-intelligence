@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Recycling AI - About</title>
+
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+        />
+
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;500;600;700&display=swap");
+
+            body {
+                background: #f8f9fa;
+                font-family: "Fira Sans", sans-serif;
+            }
+
+            .content-card {
+                border-radius: 15px;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+                transition: 0.3s ease;
+            }
+
+            .content-card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+            }
+
+            .section-icon {
+                font-size: 40px;
+                color: #28a745;
+            }
+
+            .fade-down {
+                animation: fadeDown 0.8s ease forwards;
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            @keyframes fadeDown {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            footer {
+                background: #212529;
+                color: white;
+                padding: 15px 0;
+            }
+        </style>
+    </head>
+
+    <body class="d-flex flex-column min-vh-100">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+            <div class="container">
+                <a class="navbar-brand fw-bold fs-4" href="/">♻ Recycling AI</a>
+                <button
+                    class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div
+                    class="collapse navbar-collapse justify-content-end"
+                    id="navbarNav"
+                >
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/team">Team</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/user-guide"
+                                >User Guide</a
+                            >
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Heading -->
+        <div class="container my-5 text-center fade-down">
+            <h1 class="fw-bold mb-3">About Recycling AI</h1>
+            <p class="text-muted">
+                Smart waste classification powered by Artificial Intelligence.
+            </p>
+        </div>
+
+        <div class="container mb-5 flex-grow-1 fade-down">
+            <div class="row g-4">
+                <!-- Section 1 -->
+                <div class="col-12 fade-down">
+                    <div class="card content-card p-4 fade-down">
+                        <div class="section-icon mb-3">🌍</div>
+                        <h4 class="fw-bold">What Is This Website About?</h4>
+                        <p class="text-muted">
+                            Recycling AI is an intelligent web-based system
+                            designed to classify waste materials using deep
+                            learning technology. Users can upload an image of
+                            trash, and the AI model predicts its category such
+                            as cardboard, glass, metal, paper, plastic, or
+                            general waste. The goal is to promote environmental
+                            sustainability by making waste sorting easier,
+                            faster, and more accurate.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Section 2 -->
+                <div class="col-12 fade-down">
+                    <div class="card content-card p-4 fade-down">
+                        <div class="section-icon mb-3">⚙</div>
+                        <h4 class="fw-bold">How The Website Is Built</h4>
+                        <p class="text-muted">
+                            This system is built using a modern AI-powered
+                            architecture. The frontend interface is developed
+                            using HTML, CSS, JavaScript, and Bootstrap to create
+                            a responsive and interactive user experience. The
+                            backend is powered by Flask (Python), which connects
+                            the user interface to a trained deep learning model.
+                            The AI model is developed using PyTorch and trained
+                            on a labeled waste dataset for image classification.
+                            When a user uploads an image, it is processed and
+                            passed through the neural network to generate a
+                            prediction and confidence score in real-time.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Section 3 -->
+                <div class="col-12 fade-down">
+                    <div class="card content-card p-4 fade-down">
+                        <div class="section-icon mb-3">✨</div>
+                        <h4 class="fw-bold">Key Features</h4>
+                        <ul class="text-muted">
+                            <li>Drag and drop image upload functionality</li>
+                            <li>
+                                Real-time AI prediction with confidence
+                                percentage
+                            </li>
+                            <li>
+                                Interactive scanning animation and progress bar
+                            </li>
+                            <li>File size validation for secure uploads</li>
+                            <li>
+                                Responsive design for desktop and mobile devices
+                            </li>
+                            <li>Clean and user-friendly interface</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Section 4 -->
+                <div class="col-12 fade-down">
+                    <div class="card content-card p-4 fade-down">
+                        <div class="section-icon mb-3">🎯</div>
+                        <h4 class="fw-bold">Aims & Objectives</h4>
+                        <p class="text-muted">
+                            The primary aim of this project is to contribute to
+                            environmental protection by reducing incorrect waste
+                            disposal. The objectives include:
+                        </p>
+                        <ul class="text-muted">
+                            <li>
+                                Increase public awareness of proper waste
+                                segregation
+                            </li>
+                            <li>
+                                Improve recycling efficiency using AI technology
+                            </li>
+                            <li>Reduce contamination in recycling streams</li>
+                            <li>
+                                Demonstrate practical application of machine
+                                learning in sustainability
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Section 5 -->
+                <div class="col-12 fade-down">
+                    <div class="card content-card p-4 fade-down">
+                        <div class="section-icon mb-3">🚀</div>
+                        <h4 class="fw-bold">
+                            Future Plans: Smart AI Trash Can
+                        </h4>
+                        <p class="text-muted">
+                            In the future, this system will evolve beyond a web
+                            application into a fully automated smart trash can.
+                            The AI model will be integrated into a physical
+                            waste bin equipped with a camera and embedded
+                            processor. When a user throws trash into the bin,
+                            the camera captures the image, the AI classifies it
+                            instantly, and a mechanical sorting mechanism
+                            automatically directs the waste into the correct
+                            compartment. This innovation aims to eliminate the
+                            need for manual sorting and make recycling
+                            effortless in public spaces, universities, offices,
+                            and smart cities.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="text-center mt-auto">
+            <div class="container">
+                &copy; <span id="year"></span> Recycling AI Company.
+            </div>
+        </footer>
+
+        <script>
+            document.getElementById("year").textContent =
+                new Date().getFullYear();
+        </script>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+</html>
