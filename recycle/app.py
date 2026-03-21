@@ -32,6 +32,12 @@ def model_predict(img_pil):
         img = transform(img_pil).unsqueeze(0).to(device)
         logits = model(img)
         probs = torch.softmax(logits, dim=1)
+        
+        entropy = -(probs * probs.clamp(min=1e-9).log()).sum().item()
+        max_entropy = torch.log(torch.tensor(float(len(class_names))))
+
+        if entropy > 0.7 * max_entropy:
+            return "Not Trash / Unknown", 0.0
 
         pred_idx = torch.argmax(probs, dim=1).item()
         pred_class = class_names[pred_idx]
