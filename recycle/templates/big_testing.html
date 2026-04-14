@@ -105,6 +105,10 @@
                 transform: translateY(-20px);
             }
 
+            #liveSection {
+                transition: opacity 0.3s ease;
+            }
+
             @keyframes fadeDown {
                 to {
                     opacity: 1;
@@ -163,7 +167,7 @@
 
                         <form
                             id="uploadForm"
-                            action="/predict"
+                            action="/"
                             method="post"
                             enctype="multipart/form-data"
                         >
@@ -172,12 +176,41 @@
                                 <p class="text-muted small mb-2">
                                     or click to select
                                 </p>
-                                <button
-                                    type="button"
-                                    class="btn btn-outline-success btn-sm"
+                                <div
+                                    class="d-flex justify-content-center gap-2 flex-wrap mt-2"
                                 >
-                                    Browse File
-                                </button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-success btn-sm"
+                                        id="browseBtn"
+                                    >
+                                        Browse File
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-success btn-sm"
+                                        id="mobileCameraBtn"
+                                    >
+                                        📷 Take Photo
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        id="switchCamBtn"
+                                        class="btn btn-outline-success btn-sm"
+                                    >
+                                        🔄 Switch Camera
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        class="btn btn-outline-success btn-sm"
+                                        id="webcamBtn"
+                                    >
+                                        🎥 Use Camera
+                                    </button>
+                                </div>
                             </div>
 
                             <input
@@ -190,6 +223,45 @@
                             />
 
                             <img id="preview" class="img-fluid mx-auto" />
+
+                            <div
+                                id="liveSection"
+                                class="text-center mt-3"
+                                style="display: none"
+                            >
+                                <div
+                                    style="
+                                        position: relative;
+                                        display: inline-block;
+                                    "
+                                >
+                                    <video
+                                        id="video"
+                                        autoplay
+                                        playsinline
+                                        muted
+                                        class="img-fluid rounded"
+                                    ></video>
+                                    <canvas
+                                        id="overlayCanvas"
+                                        style="
+                                            position: absolute;
+                                            top: 0;
+                                            left: 0;
+                                        "
+                                    ></canvas>
+                                </div>
+                                <canvas
+                                    id="canvas"
+                                    style="display: none"
+                                ></canvas>
+
+                                <h4 class="mt-3">Live Prediction:</h4>
+                                <h5 id="liveResult" class="text-success">
+                                    Waiting...
+                                </h5>
+                                <p id="liveConfidence"></p>
+                            </div>
 
                             <button
                                 type="submit"
@@ -255,44 +327,220 @@
         </div>
 
         <script>
+            // =============================
+            // BASIC SETUP
+            // =============================
             document.getElementById("year").textContent =
                 new Date().getFullYear();
 
+            const liveSection = document.getElementById("liveSection");
             const imageInput = document.getElementById("imageInput");
             const preview = document.getElementById("preview");
-
-            imageInput.addEventListener("change", function (event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        preview.src = e.target.result;
-                        preview.style.display = "block";
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    preview.style.display = "none";
-                }
-            });
-
-            window.addEventListener("load", function () {
-                const bar = document.getElementById("confidenceBar");
-                if (bar) {
-                    const confidence = bar.getAttribute("aria-valuenow");
-                    setTimeout(() => {
-                        bar.style.width = confidence + "%";
-                    }, 300);
-                }
-            });
-
             const dropArea = document.getElementById("dropArea");
             const form = document.getElementById("uploadForm");
             const spinner = document.getElementById("spinner");
             const errorMsg = document.getElementById("errorMsg");
 
+            const browseBtn = document.getElementById("browseBtn");
+            const mobileCameraBtn = document.getElementById("mobileCameraBtn");
+            const webcamBtn = document.getElementById("webcamBtn");
+
+            const switchCamBtn = document.getElementById("switchCamBtn");
+            switchCamBtn.style.display = "none"; // hide initially
+
+            const video = document.getElementById("video");
+            const canvas = document.getElementById("canvas");
+
+            const overlay = document.getElementById("overlayCanvas");
+            const octx = overlay.getContext("2d");
+
+            const liveResult = document.getElementById("liveResult");
+            const liveConfidence = document.getElementById("liveConfidence");
+
             const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-            dropArea.addEventListener("click", () => imageInput.click());
+            let stream = null;
+            let isCameraOn = false;
+
+            let lastSent = 0;
+            const SEND_INTERVAL = 200; // ms
+
+            // =============================
+            // DEVICE DETECTION
+            // =============================
+            const isMobile = /Android|iPhone|iPad|iPod/i.test(
+                navigator.userAgent,
+            );
+
+            if (isMobile) {
+                webcamBtn.style.display = "none"; // hide laptop-only
+                mobileCameraBtn.style.display = "inline-block"; // ensure mobile button is visible
+                switchCamBtn.style.display = "none"; // hide switch button until camera starts
+            } else {
+                mobileCameraBtn.style.display = "none"; // hide on desktop
+                switchCamBtn.style.display = "none"; // hide switch button on desktop
+            }
+
+            // =============================
+            // BROWSE FILE
+            // =============================
+            browseBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                imageInput.removeAttribute("capture");
+                imageInput.click();
+            });
+
+            // =============================
+            // MOBILE CAMERA
+            // =============================
+            // ✅ Global variables
+            let currentFacing = "environment"; // default back camera
+
+            // ✅ Function to start camera
+            async function startCamera(facingMode = "environment") {
+                if (stream) stream.getTracks().forEach((track) => track.stop());
+
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: facingMode,
+                            width: { ideal: 1280, min: 640 },
+                            height: { ideal: 720, min: 480 },
+                        },
+                        audio: false,
+                    });
+
+                    video.srcObject = stream;
+                    video.muted = true; // autoplay requirement
+                    video.playsInline = true; // iOS requirement
+                    video.style.display = "block";
+                    liveSection.style.display = "block";
+
+                    isCameraOn = true;
+                    switchCamBtn.style.display = "inline-block";
+                    startLiveDetection();
+                    liveResult.textContent = "Detecting...";
+                    liveConfidence.textContent = "";
+                } catch (err) {
+                    console.error("Camera error:", err);
+                    alert("Could not start camera: " + err.message);
+                }
+            }
+
+            // ✅ Mobile camera button click
+            mobileCameraBtn.addEventListener("click", async (e) => {
+                e.stopPropagation();
+
+                if (!isCameraOn) {
+                    currentFacing = "environment"; // default back camera
+                    await startCamera(currentFacing);
+                    mobileCameraBtn.textContent = "❌ Stop Camera";
+                } else {
+                    stopCamera();
+                }
+            });
+
+            // ✅ Switch camera button click
+            switchCamBtn.addEventListener("click", async () => {
+                currentFacing =
+                    currentFacing === "environment" ? "user" : "environment";
+                await startCamera(currentFacing);
+            });
+
+            // =============================
+            // CAMERA TOGGLE (MAIN FEATURE)
+            // =============================
+            webcamBtn.addEventListener("click", async (e) => {
+                e.stopPropagation();
+
+                if (!isCameraOn) {
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({
+                            video: true,
+                        });
+
+                        video.srcObject = stream;
+                        video.style.display = "block";
+
+                        liveSection.style.display = "block";
+
+                        // Remove uploaded image
+                        preview.classList.remove("show");
+                        preview.src = "";
+                        imageInput.value = "";
+
+                        isCameraOn = true;
+                        startLiveDetection();
+                        webcamBtn.textContent = "❌ Stop Camera";
+
+                        liveResult.textContent = "Detecting...";
+                        liveConfidence.textContent = "";
+                    } catch (err) {
+                        alert("Camera permission denied");
+                    }
+                } else {
+                    stopCamera();
+                }
+            });
+
+            function stopCamera() {
+                if (stream) {
+                    stream.getTracks().forEach((track) => track.stop());
+                }
+
+                video.style.display = "none";
+
+                // HIDE live section
+                liveSection.style.display = "none";
+
+                isCameraOn = false;
+                mobileCameraBtn.textContent = "📷 Take Photo";
+                switchCamBtn.style.display = "none"; // hide switch button
+
+                webcamBtn.textContent = "🎥 Use Camera";
+            }
+
+            // =============================
+            // FILE UPLOAD HANDLER
+            // =============================
+            imageInput.addEventListener("change", function () {
+                const file = this.files[0];
+                if (!file) return;
+
+                // Stop camera if running
+                if (isCameraOn) stopCamera();
+
+                // Hide live section just in case
+                liveSection.style.opacity = "0";
+                setTimeout(() => {
+                    liveSection.style.display = "none";
+                }, 1000);
+
+                if (file.size > MAX_FILE_SIZE) {
+                    errorMsg.textContent = "File too large! Max 10MB.";
+                    imageInput.value = "";
+                    preview.classList.remove("show");
+                    return;
+                }
+
+                errorMsg.textContent = "";
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.classList.add("show");
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // =============================
+            // DRAG & DROP
+            // =============================
+            dropArea.addEventListener("click", (e) => {
+                if (e.target.tagName !== "BUTTON") {
+                    imageInput.click();
+                }
+            });
 
             dropArea.addEventListener("dragover", (e) => {
                 e.preventDefault();
@@ -306,47 +554,129 @@
             dropArea.addEventListener("drop", (e) => {
                 e.preventDefault();
                 dropArea.classList.remove("dragover");
+
                 const file = e.dataTransfer.files[0];
-                handleFile(file);
+
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                imageInput.files = dt.files;
+
+                imageInput.dispatchEvent(new Event("change"));
             });
 
-            imageInput.addEventListener("change", function () {
-                handleFile(this.files[0]);
-            });
-
-            function handleFile(file) {
-                if (!file) return;
-
-                if (file.size > MAX_FILE_SIZE) {
-                    errorMsg.textContent =
-                        "File too large! Maximum size is 10MB.";
-                    imageInput.value = "";
-                    preview.classList.remove("show");
-                    return;
-                }
-
-                errorMsg.textContent = "";
-
-                imageInput.files = new DataTransfer().files;
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                imageInput.files = dataTransfer.files;
-
-                showPreview(file);
-            }
-
-            function showPreview(file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    preview.src = e.target.result;
-                    preview.classList.add("show");
-                };
-                reader.readAsDataURL(file);
-            }
-
+            // =============================
+            // FORM SUBMIT (SPINNER)
+            // =============================
             form.addEventListener("submit", function () {
                 dropArea.classList.add("scanning");
                 spinner.style.display = "flex";
+            });
+
+            // =============================
+            // PROGRESS BAR ANIMATION
+            // =============================
+            window.addEventListener("load", function () {
+                const bar = document.getElementById("confidenceBar");
+                if (bar) {
+                    const confidence = bar.getAttribute("aria-valuenow");
+                    setTimeout(() => {
+                        bar.style.width = confidence + "%";
+                    }, 300);
+                }
+            });
+
+            // =============================
+            // LIVE AI PREDICTION
+            // =============================
+            async function sendFrame() {
+                if (!isCameraOn || !video.videoWidth) return;
+
+                // Match canvas size with video
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                const scaleX = overlay.width / video.videoWidth;
+                const scaleY = overlay.height / video.videoHeight;
+
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(video, 0, 0);
+
+                const blob = await new Promise((resolve) =>
+                    canvas.toBlob(resolve, "image/jpeg"),
+                );
+
+                const formData = new FormData();
+                formData.append("image", blob, "frame.jpg");
+
+                try {
+                    const res = await fetch("/predict", {
+                        method: "POST",
+                        body: formData,
+                    });
+
+                    const rect = video.getBoundingClientRect();
+
+                    overlay.width = rect.width;
+                    overlay.height = rect.height;
+
+                    const data = await res.json();
+
+                    // 🔥 Clear previous drawings
+                    octx.clearRect(0, 0, overlay.width, overlay.height);
+
+                    // 🔥 Draw boxes
+                    data.boxes.forEach((box) => {
+                        const { x1, y1, x2, y2, prediction, confidence } = box;
+
+                        // Rectangle
+                        octx.strokeStyle = "lime";
+                        octx.lineWidth = 3;
+                        const sx1 = x1 * scaleX;
+                        const sy1 = y1 * scaleY;
+                        const sx2 = x2 * scaleX;
+                        const sy2 = y2 * scaleY;
+
+                        octx.strokeRect(sx1, sy1, sx2 - sx1, sy2 - sy1);
+
+                        // Text
+                        octx.fillStyle = "lime";
+                        octx.font = "16px Arial";
+                        octx.fillText(
+                            `${prediction} (${confidence}%)`,
+                            sx1,
+                            sy1 > 10 ? sy1 - 5 : sy1 + 15,
+                        );
+                    });
+                } catch (err) {
+                    console.error(err);
+                }
+            }
+
+            // Run every 1 second (ONLY when camera ON)
+            let isProcessing = false;
+
+            async function startLiveDetection() {
+                async function loop() {
+                    if (!isCameraOn) return;
+
+                    const now = Date.now();
+                    if (!isProcessing && now - lastSent > SEND_INTERVAL) {
+                        isProcessing = true;
+                        await sendFrame(); // POST to /predict
+                        isProcessing = false;
+                        lastSent = now;
+                    }
+
+                    requestAnimationFrame(loop); // still smooth animation
+                }
+
+                loop();
+            }
+
+            switchCamBtn.addEventListener("click", async () => {
+                currentFacing =
+                    currentFacing === "environment" ? "user" : "environment";
+                await startCamera(currentFacing);
             });
         </script>
 
