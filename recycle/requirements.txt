@@ -6,3 +6,5 @@ pillow
 opencv-python-headless
 numpy
 ultralytics
+opencv-python
+ultralytics

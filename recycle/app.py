@@ -11,7 +11,20 @@ from ultralytics import YOLO
 
 app = Flask(__name__)
 
-# ✅ Load model ONCE (important for performance)
+TRASH_CLASSES = [
+    39,  # bottle
+    40,  # wine glass
+    41,  # cup
+    44,  # spoon
+    45,  # bowl
+    46, 47, 48, 49, 50, 51,  # food (optional)
+    73,  # book (paper)
+    75,  # vase
+    76,  # scissors
+    79   # toothbrush
+]
+
+# Load model ONCE (important for performance)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model = torch.load(
     "recycle_model_full.pt",
@@ -25,7 +38,7 @@ yolo = YOLO("yolov8n.pt")
 
 class_names = ["cardboard", "glass", "metal", "paper", "plastic", "trash"]
 
-# ✅ Transform
+# Transform
 transform = transforms.Compose([
     transforms.Resize((260, 260)),
     transforms.ToTensor(),
@@ -35,8 +48,7 @@ transform = transforms.Compose([
     )
 ])
 
-
-# ✅ Prediction function (reuse everywhere)
+# Prediction function (reuse everywhere)
 def model_predict(img_pil):
     with torch.inference_mode():
         img = transform(img_pil).unsqueeze(0).to(device)
@@ -87,7 +99,7 @@ def testing():
     return render_template("big_testing.html")
 
 
-# ✅ OLD IMAGE UPLOAD (kept)
+# OLD IMAGE UPLOAD (kept)
 @app.route("/", methods=["POST"])
 def predict_upload():
     file = request.files.get("image")
@@ -112,7 +124,7 @@ def predict_upload():
     )
 
 
-# ✅ 🔥 NEW REAL-TIME API (THIS IS THE KEY)
+# REAL-TIME API 
 @app.route("/predict", methods=["POST"])
 def predict_realtime():
     file = request.files.get("image")
@@ -129,20 +141,19 @@ def predict_realtime():
     boxes_data = []
     for box in results.boxes:
         cls_id = int(box.cls[0])
-        # if cls_id == 0:
+        yolo_label = results.names[cls_id]
+        # if cls_id not in TRASH_CLASSES:
         #     continue
-    
         x1, y1, x2, y2 = map(int, box.xyxy[0]) 
 
-        # 🔥 Crop object
         cropped = img.crop((x1, y1, x2, y2))
 
-        # 🔥 Classify with YOUR model
-        label, confidence = model_predict(cropped)
-
-        # Optional: skip unknown
-        if label == "Not Trash / Unknown":
-            continue
+        # Only classify trash-related objects
+        if cls_id in TRASH_CLASSES:
+            label, confidence = model_predict(cropped)
+        else:
+            label = f"Not Trash | Seeing ({yolo_label})"
+            confidence = 0.0
 
         boxes_data.append({
             "x1": x1,
